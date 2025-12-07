@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=qwen3-inpz
+#SBATCH --job-name=qwen3-zoomclick
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
@@ -12,27 +12,35 @@
 set -euo pipefail
 set -x
 
-USER_NAME=${USER:-sl8264}
-SCRATCH=${SCRATCH:-/scratch/gpfs/$USER_NAME/zhiyuan}
-HOME_DIR=${HOME:-/home/$USER_NAME}/zhiyuan
-CODE_DIR=${HOME_DIR}/code/zoomclick/Open-Source
-DATA_DIR=${SCRATCH}/datasets/ScreenSpot-Pro
-MODEL_DIR=${SCRATCH}/huggingface/Qwen3-VL-32B-Instruct
-LOG_DIR=${CODE_DIR}/results/sspro
+USER_NAME=${USER:-your_user_name}
+
+# === Paths (customize for your environment) ===
+# CODE_DIR: this ZoomClick repository (must contain grounding/eval_sspro_zoomclick.py)
+CODE_DIR=${CODE_DIR:-/path/to/code/ZoomClick}
+
+# DATA_DIR: ScreenSpot-Pro dataset root (must contain images/ and annotations/)
+DATA_DIR=${DATA_DIR:-/path/to/dataset/ScreenSpot-Pro}
+
+# MODEL_DIR: Qwen3-VL model weights
+MODEL_DIR=${MODEL_DIR:-/path/to/models/Qwen3-VL-32B-Instruct}
+
+# LOG_DIR: directory to save evaluation results
+LOG_DIR=${LOG_DIR:-${CODE_DIR}/results/sspro}
 mkdir -p "${LOG_DIR}"
 
-# Caches
-export HF_HOME=${SCRATCH}/cache/hf
-export TRANSFORMERS_CACHE=${HF_HOME}/transformers
-export TORCH_HOME=${SCRATCH}/cache/torch
+# === Optional caches ===
+SCRATCH=${SCRATCH:-/path/to/scratch}
+export HF_HOME=${HF_HOME:-${SCRATCH}/cache/hf}
+export TRANSFORMERS_CACHE=${TRANSFORMERS_CACHE:-${HF_HOME}/transformers}
+export TORCH_HOME=${TORCH_HOME:-${SCRATCH}/cache/torch}
 mkdir -p "${TRANSFORMERS_CACHE}" "${TORCH_HOME}"
 
 export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK:-1}
 export PYTHONUNBUFFERED=1
 export TOKENIZERS_PARALLELISM=false
 
-# Python env
-PY=${PY:-${SCRATCH}/conda/envs/uivenus/bin/python}
+# === Python in conda env (zoomclick) ===
+PY=${PY:-/path/to/conda/envs/zoomclick/bin/python}
 [ -x "${PY}" ] || { echo "[ERR] Python not found at ${PY}" >&2; exit 127; }
 
 # Sanity checks
@@ -42,7 +50,7 @@ done
 
 cd "${CODE_DIR}"
 
-# Run evaluation
+# Run evaluation: ZoomClick + Qwen3-VL on ScreenSpot-Pro
 "${PY}" grounding/eval_sspro_zoomclick.py \
   --backend qwen3 \
   --model_type qwen3_ground_32b \
@@ -62,4 +70,3 @@ cd "${CODE_DIR}"
   --prezoom_px_thresh 50
 
 echo "Evaluation finished."
-

@@ -18,15 +18,15 @@
   <em>* Equal contribution &nbsp;·&nbsp; † Corresponding authors</em>
 </p>
 
-This repo provides the official implementaion for ZoomClick and GUIZoom-Bench. We first release the implementations of our method based on UI-Venus and Qwen3-VL, together with the dataset re-organization method of our benchmark.
+This repo provides the official implementaion for ZoomClick and GUIZoom-Bench.
 
 <img width="1924" height="836" alt="fig1" src="https://github.com/user-attachments/assets/2243c3a7-8465-4117-9312-274c41b3f46d" />
 
 
 ## Highlights
-- **ZoomClick**：Our training-free method treats zoom as a strong prior and explicitly models zoom–locate–click interaction on high-resolution GUIs, decomposing GUI grounding into a sequence of reliable local decisions and substantially improving robustness and accuracy for both general vision–language and specialized GUI grounding models.
-- **GUIZoom-Bench**：Our benchmark is dedicated to evaluating models’ adaptability to zoom in GUI grounding, focusing on scenarios that require dynamic spatial focusing, adaptive context switching, and fine-grained element localization, thus providing a standardized testbed for zoom-based training and test-time scaling.
-- **Strong Performance**：With ZoomClick, UI-Venus-72B achieves a 73.1% success rate on ScreenSpot-Pro, establishing new state-of-the-art performance on this mainstream GUI grounding benchmark.
+- **ZoomClick**：Exploring zooming to dig out more grounding priors of both generalist VLMs and specialized GUI grounding models in a training-free, principled, effective way.
+- **GUIZoom-Bench**：Evaluating models’ zoom capability with explainable standards, supporting future research on zoom-based training and test-time scaling.
+- **Strong Performance**：With ZoomClick, UI-Venus-72B achieves a 73.1% success rate on ScreenSpot-Pro, establishing a new state-of-the-art performance.
 
 
 ## Repository Structure
@@ -36,14 +36,17 @@ This repo provides the official implementaion for ZoomClick and GUIZoom-Bench. W
   - `models/`: Backbone wrappers and ZoomClick variants (Qwen3-VL, UI-Venus).
 
 - **`GUIZoom-Bench/`**: Scripts for building and evaluating GUIZoom-Bench
-  - `build_guizoom.py`: Re-organize ScreenSpot-Pro–style data into GUIZoom-Bench.
-  - `collect_guizoom_accuracy.py`: Compute accuracy and related metrics on GUIZoom-Bench.
+  - `build_guizoom.py`: Re-organize ScreenSpot-Pro dataset into GUIZoom-Bench.
+  - `collect_guizoom_accuracy.py`: Compute accuracy and related metrics on GUIZoom-Bench based on grounding results on Screenspot-Pro.
 
-- **`results/`**: Example JSON results used to reproduce tables and figures
-  - `sspro/venus_72b.json`, `sspro/venus_72b_depth_1.json`, etc.
+- **`results/sspro`**: Example JSON results used to reproduce tables and figures
+  - `zoomclick_*_clip.json` files are the results provided by default settings in `run_zoomclick_*.slurm`.
+  - `venus_7b_depth_(1-4).json` are results used to build GUIZoom-Bench.
 
 - **`scripts/`**: Utility and cluster (Slurm) scripts
-  - `run_zoomclick_qwen3.slurm`, `run_zoomclick_uivenus.slurm`: Example Slurm jobs for running ZoomClick evaluations and benchmark building.
+  - `run_zoomclick_*.slurm`: Example Slurm jobs for running ZoomClick evaluations and benchmark building.
+  - `run_collect_guizoom.slurm`: Slurm script used for GUIZoom-Bench result re-organization.
+  - `run_build_guizoom.slurm`: Slurm script used for building GUIZoom-Bench dataset.
 
 ## Installation
 1. **Environment Setup**
@@ -83,36 +86,55 @@ This repo provides the official implementaion for ZoomClick and GUIZoom-Bench. W
            --depth4 /path/to/depth4.json \
            --out_dir /path/to/dataset/GUIZoom-Bench
         ```
-       This will create GUIZoom-Bench splits, annotations, images, and statistics under `/path/to/dataset/GUIZoom-Bench`.
+        - args `--depthx`: 'results/sspro/venus_7b_depth_x'
+    
+       This will create GUIZoom-Bench splits, annotations, images, and statistics under `/path/to/dataset/GUIZoom-Bench`. We recommend to store Screenspot-Pro and GUIZoom-Bench in the same `dataset` directory for convenient use.
 
 ## Evaluation
+We recommend using at least one A100 GPU for models up to 8B, and at least four A100 GPUs for models 32B and above.
+
 1. **Eval on Screenspot-Pro**：
    - On a cluster: Modify Basic paths in `scripts/run_zoomclick_uivenus.slurm` and `scripts/run_zoomclick_qwen3.slurm` according to your data structure and submit the slurm script.
    - Otherwise:
      - Activate conda environment: `conda activate path/to/your/conda/envs/zoomclick`
      - Run evaluation according to your own setting:
-     ```
-     python grounding/eval_sspro_zoomclick.py \
-        --backend uivenus \
-        --model_type ui_venus_ground_7b \
-        --model_name_or_path "${MODEL_DIR}" \
-        --screenspot_imgs "${DATA_DIR}/images" \
-        --screenspot_test "${DATA_DIR}/annotations" \
-        --task "all" \
-        --inst_style "instruction" \
-        --language "en" \
-        --gt_type "positive" \
-        --log_path "${LOG_DIR}/zoomclick_venus_7b_clip.json" \
-        --in_depth 3 \
-        --in_ratio 0.5 \
-        --in_min_crop 768 \
-        --patch_size 2 \
-        --center_mode "clip" \
-        --prezoom_px_thresh 50
-     ```
+         ```
+         python grounding/eval_sspro_zoomclick.py \
+            --backend uivenus \
+            --model_type ui_venus_ground_7b \
+            --model_name_or_path "${MODEL_DIR}" \
+            --screenspot_imgs "${DATA_DIR}/images" \
+            --screenspot_test "${DATA_DIR}/annotations" \
+            --task "all" \
+            --inst_style "instruction" \
+            --language "en" \
+            --gt_type "positive" \
+            --log_path "${LOG_DIR}/zoomclick_venus_7b_clip.json" \
+            --in_depth 3 \
+            --in_ratio 0.5 \
+            --in_min_crop 768 \
+            --patch_size 2 \
+            --center_mode "clip" \
+            --prezoom_px_thresh 50
+         ```
+         - `--in_depth`: The number of iterative zoom-in steps applied during evaluation.
+         - `--in_ratio`: The shrink ratio for each zoom-in step.
+         - `--in_min_crop`: The minimum crop size to retain sufficient visual context during zooming.
+         - `--patch_size`: The grid resolution used when estimating the zoom center in Pre-Zoom. By default, `patch_size=2` represents a 2*2 grid.
+         - `--center_mode`: Mode of boundary handling. Choose from `shift`, 'clip', 'shrink'.
+         - `--prezoom_px_thresh`: Threshold of pixel distance used in Pre-zoom. Refer to our paper for more details.
 
 2. **Eval on GUIZoom-Bench**:
-   - Directly follow the same commands as in Eval on ScreenSpot-Pro, but set `DATA_DIR=${SCRATCH}/datasets/GUIZoom-Bench` instead of `DATA_DIR=${SCRATCH}/datasets/ScreenSpot-Pro`.
+   There are two ways to evaluate your model on GUIZoom-Bench:
+     - **Re-organize Screenspot-Pro data**:
+         - Build GUIZoom-Bench following commands in Data Preparation.
+         - Directly follow the same commands as in Eval on ScreenSpot-Pro, but set `DATA_DIR=${SCRATCH}/datasets/GUIZoom-Bench` instead of `DATA_DIR=${SCRATCH}/datasets/ScreenSpot-Pro`.
+     - **Re-organize Screenspot-Pro results** (Recommended):
+         - Because our benchmark is built from Screenspot-Pro, evaluation results on Screenspot-Pro can also be re-organized into GUIZoom-Bench results without additional computation. This design removes the need to store a duplicated dataset for benchmarking, effectively reducing storage usage and avoiding waste.
+         - Simply adjust arguments in `scripts/run_collect_guizoom.slurm`:
+             - `--results`: path to the JSON result to be re-orgainzed
+             - `--dataset`: path to GUIZoom-Bench
+             - `--output`: path to the re-orgainzed JSON result
 
 ## Citation
-If you find our work helpful, please leave us a star and cite our paper. Thank you!
+If you find our work helpful, please leave us a star and cite our paper.
