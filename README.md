@@ -44,7 +44,7 @@ This repo provides the official implementaion for ZoomClick and GUIZoom-Bench.
   - `venus_7b_depth_(1-4).json` are results used to build GUIZoom-Bench.
 
 - **`scripts/`**: Utility and cluster (Slurm) scripts
-  - `run_zoomclick_*.slurm`: Example Slurm jobs for running ZoomClick evaluations and benchmark building.
+  - `run_zoomclick_*.slurm`: Example Slurm jobs for running ZoomClick evaluations on Screenspot-Pro.
   - `run_collect_guizoom.slurm`: Slurm script used for GUIZoom-Bench result re-organization.
   - `run_build_guizoom.slurm`: Slurm script used for building GUIZoom-Bench dataset.
 
