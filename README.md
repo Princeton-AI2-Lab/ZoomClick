@@ -1,5 +1,7 @@
 # Zoom in, Click out: Unlocking and Evaluating the Potential of Zooming for GUI Grounding
 
+[![arXiv](https://img.shields.io/badge/arXiv-2512.05941-b31b1b.svg?logo=arxiv&logoColor=white)](https://arxiv.org/abs/2512.05941)
+
 <p>
   <a href="https://github.com/zhiyuanjiang04">Zhiyuan Jiang</a><sup>*</sup> ·
   <a href="https://github.com/shxie2020">Shenghao Xie</a><sup>*</sup> ·
@@ -137,4 +139,16 @@ We recommend using at least one A100 GPU for models up to 8B, and at least four 
              - `--output`: path to the re-orgainzed JSON result
 
 ## Citation
-If you find our work helpful, please leave us a star and cite our paper.
+If you find our work helpful, please leave us a star and cite our paper：
+
+```
+@misc{jiang2025zoominclickout,
+      title={Zoom in, Click out: Unlocking and Evaluating the Potential of Zooming for GUI Grounding}, 
+      author={Zhiyuan Jiang and Shenghao Xie and Wenyi Li and Wenqiang Zu and Peihang Li and Jiahao Qiu and Siqi Pei and Lei Ma and Tiejun Huang and Mengdi Wang and Shilong Liu},
+      year={2025},
+      eprint={2512.05941},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2512.05941}, 
+}
+```
