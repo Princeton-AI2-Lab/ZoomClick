@@ -5,13 +5,13 @@
 <p>
   <a href="https://github.com/zhiyuanjiang04">Zhiyuan Jiang</a><sup>*</sup> ·
   <a href="https://github.com/shxie2020">Shenghao Xie</a><sup>*</sup> ·
-   Wenyi Li ·
-   Wenqiang Zu ·
-   Peihang Li · 
-   Jiahao Qiu ·
-   Siqi Pei ·
+  <a href="https://github.com/wenyi-li">Wenyi Li</a> ·
+  <a href="https://github.com/zuwenqiang">Wenqiang Zu</a> ·
+  <a href="https://github.com/abrohamLee">Peihang Li</a> · 
+  <a href="https://github.com/CharlesQ9">Jiahao Qiu</a> ·
+  <a href="https://siqi-pei.github.io">Siqi Pei</a> ·
   <a href="https://www.ai.pku.edu.cn/en/info/1462/2126.htm">Lei Ma</a><sup>†</sup> ·
-   Tiejun Huang ·
+  <a href="https://cfcs.pku.edu.cn/english/people/faculty/tiejunhuang/index.htm">Tiejun Huang</a> ·
   <a href="https://mwang-delta.vercel.app/">Mengdi Wang</a><sup>†</sup> ·
   <a href="https://github.com/SlongLiu">Shilong Liu</a><sup>†</sup>
 </p>
