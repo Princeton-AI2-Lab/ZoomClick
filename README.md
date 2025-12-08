@@ -10,9 +10,9 @@
    Peihang Li · 
    Jiahao Qiu ·
    Siqi Pei ·
-   Lei Ma<sup>†</sup> ·
+  <a href="https://www.ai.pku.edu.cn/en/info/1462/2126.htm">Lei Ma</a><sup>†</sup> ·
    Tiejun Huang ·
-   Mengdi Wang<sup>†</sup> ·
+  <a href="https://mwang-delta.vercel.app/">Mengdi Wang</a><sup>†</sup> ·
   <a href="https://github.com/SlongLiu">Shilong Liu</a><sup>†</sup>
 </p>
 
